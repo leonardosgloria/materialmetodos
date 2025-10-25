@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerador de Metodologia Científica</title>
+  <style>
+    :root{
+      --primary-dark:#1e293b;   /* navy azulado */
+      --primary-light:#3b82f6;  /* azul médio vibrante */
+      --bg-light:#f1f5f9;       /* azul clarinho */
+      --text-dark:#1e293b;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    body{
+      font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background:linear-gradient(135deg, var(--primary-dark) 0%, #e0e7ff 100%);
+      min-height:100vh; padding:20px;
+      color:var(--text-dark);
+      display:flex; justify-content:center; align-items:center;
+    }
+
+    .container{
+      width:100%; max-width:1200px;
+      background:#fff; border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.3); overflow:hidden;
+    }
+
+    header{
+      background:linear-gradient(135deg, var(--primary-dark) 30%, #e0e7ff 100%);
+      color:#fff; padding:28px 24px; text-align:center;
+    }
+
+    .header-inner{
+      max-width:1000px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:12px;
+    }
+
+    .logo{width:96px; height:auto; border-radius:50%; display:block}
+
+    header h1{font-size:28px; margin:4px 0 2px 0}
+    header p{opacity:.92; font-size:14px}
+
+    .btn-hotmart{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:14px 18px; border:0; border-radius:10px;
+      background:linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      box-shadow:0 8px 18px rgba(30,41,59,.35);
+      color:#fff; font-weight:700; font-size:15px; cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease, filter .2s ease;
+      text-decoration:none; margin-top:6px;
+    }
+    .btn-hotmart:hover{transform:translateY(-2px); filter:brightness(1.04)}
+    .btn-hotmart:active{transform:translateY(0)}
+
+    .chat-container{padding:30px; max-height:600px; overflow-y:auto}
+
+    .section{margin-bottom:28px; animation:fadeIn .5s ease-in}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+
+    .section-title{
+      font-size:18px; font-weight:800; color:var(--primary-dark);
+      margin-bottom:14px; display:flex; align-items:center; gap:10px;
+    }
+    .section-title::before{content:''; width:4px; height:20px; background:var(--primary-light); border-radius:2px}
+
+    .field{margin-bottom:14px}
+    .field label{
+      display:block; font-size:14px; font-weight:600; color:#333; margin-bottom:6px;
+    }
+    .field input,.field textarea{
+      width:100%; padding:12px;
+      border:2px solid #e0e0e0; border-radius:8px; font-size:14px; transition:all .3s; font-family:inherit;
+    }
+    .field input:focus,.field textarea:focus{
+      outline:none; border-color:var(--primary-light);
+      box-shadow:0 0 0 3px rgba(59,130,246,.12);
+    }
+    .field textarea{min-height:80px; resize:vertical}
+
+    .example-badge{
+      display:inline-block; background:#fef3c7; color:#92400e;
+      padding:4px 8px; border-radius:4px; font-size:12px; font-weight:500; margin-left:8px;
+    }
+
+    .prompt-output{
+      background:#f8f9fa; border:2px dashed var(--primary-light);
+      border-radius:12px; padding:18px; margin:26px 0; display:none;
+    }
+    .prompt-output.show{display:block; animation:fadeIn .5s ease-in}
+
+    .prompt-text{
+      font-size:14px; line-height:1.75; color:#333;
+      white-space:pre-wrap; max-height:420px; overflow-y:auto;
+      padding:12px; background:#fff; border-radius:8px; border:1px solid #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace;
+    }
+
+    .button-group{display:flex; gap:12px; padding:0 30px 28px 30px; flex-wrap:wrap}
+    button{
+      flex:1; min-width:220px; padding:15px 30px; border:none; border-radius:10px;
+      font-size:16px; font-weight:700; cursor:pointer; transition:transform .2s, box-shadow .2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-generate{
+      background:linear-gradient(135deg, var(--primary-dark), var(--primary-light)); color:#fff;
+    }
+    .btn-generate:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(59,130,246,.35)}
+    .btn-copy{background:#0ea5e9; color:#fff; display:none}
+    .btn-copy.show{display:flex}
+    .btn-copy:hover{background:#0284c7; transform:translateY(-2px); box-shadow:0 10px 20px rgba(2,132,199,.3)}
+    .btn-copy.copied{background:#10b981}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:8px}
+    ::-webkit-scrollbar-track{background:#f1f1f1; border-radius:10px}
+    ::-webkit-scrollbar-thumb{background:var(--primary-light); border-radius:10px}
+    ::-webkit-scrollbar-thumb:hover{background:#2563eb}
+
+    /* Responsivo */
+    @media (max-width: 640px){
+      header h1{font-size:22px}
+      .button-group{padding:0 16px 22px 16px}
+      .chat-container{padding:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-inner">
+        <img src="logo.png" alt="Logo" class="logo" />
+        <h1>🧠 Gerador de Metodologia Científica</h1>
+        <p>Preencha os campos e gere um prompt completo para criar sua seção de Materiais e Métodos</p>
+
+        <!-- Botão no mesmo padrão do seu outro layout -->
+        <a class="btn-hotmart"
+           href="https://hotmart.com/pt-br/club/estatistica-com-r"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Acessar o curso Estatística com R">
+          🎓 Acesse para conhecer as aulas, módulos e materiais do curso
+        </a>
+      </div>
+    </header>
+
+    <div class="chat-container">
+      <!-- 🧪 Desenho Experimental -->
+      <div class="section">
+        <div class="section-title">🧪 Desenho Experimental</div>
+        <div class="field">
+          <label>Tipo de estudo <span class="example-badge">ex: experimental, observacional</span></label>
+          <input type="text" id="tipo_estudo" placeholder="Digite o tipo de estudo...">
+        </div>
+        <div class="field">
+          <label>Objetivo principal</label>
+          <textarea id="objetivo" placeholder="Ex: avaliar o efeito da dieta X sobre o colesterol em mulheres"></textarea>
+        </div>
+        <div class="field">
+          <label>Variáveis independentes (fatores)</label>
+          <input type="text" id="var_independentes" placeholder="Ex: dieta, tempo, tratamento">
+        </div>
+        <div class="field">
+          <label>Variáveis dependentes (respostas)</label>
+          <input type="text" id="var_dependentes" placeholder="Ex: glicemia, peso, colesterol total">
+        </div>
+        <div class="field">
+          <label>Número de grupos e tratamentos</label>
+          <input type="text" id="grupos" placeholder="Ex: 2 grupos (controle e tratamento)">
+        </div>
+        <div class="field">
+          <label>Número de repetições por grupo</label>
+          <input type="text" id="repeticoes" placeholder="Ex: 10 repetições">
+        </div>
+        <div class="field">
+          <label>Unidade experimental</label>
+          <input type="text" id="unidade" placeholder="Ex: indivíduo, animal, amostra biológica">
+        </div>
+        <div class="field">
+          <label>Tipo de aleatorização</label>
+          <input type="text" id="aleatorizacao" placeholder="Ex: completamente casualizado, blocos">
+        </div>
+      </div>
+
+      <!-- 🧍‍♀️ Amostra e Critérios -->
+      <div class="section">
+        <div class="section-title">🧍‍♀️ Amostra e Critérios</div>
+        <div class="field">
+          <label>Tamanho da amostra</label>
+          <input type="text" id="tamanho_amostra" placeholder="Ex: 20 participantes">
+        </div>
+        <div class="field">
+          <label>Critérios de inclusão</label>
+          <textarea id="criterios_inclusao" placeholder="Ex: mulheres entre 18-45 anos, saudáveis"></textarea>
+        </div>
+        <div class="field">
+          <label>Critérios de exclusão</label>
+          <textarea id="criterios_exclusao" placeholder="Ex: gestantes, diabéticos, em uso de medicação"></textarea>
+        </div>
+        <div class="field">
+          <label>Período e local do estudo</label>
+          <input type="text" id="periodo_local" placeholder="Ex: Janeiro a Março de 2024, Hospital XYZ">
+        </div>
+      </div>
+
+      <!-- ⚙️ Coleta e Processamento -->
+      <div class="section">
+        <div class="section-title">⚙️ Coleta e Processamento</div>
+        <div class="field">
+          <label>Instrumentos ou equipamentos usados</label>
+          <textarea id="instrumentos" placeholder="Ex: glicosímetro modelo X, balança digital"></textarea>
+        </div>
+        <div class="field">
+          <label>Frequência das medições</label>
+          <input type="text" id="frequencia" placeholder="Ex: semanalmente, antes e após intervenção">
+        </div>
+        <div class="field">
+          <label>Tipo de dado coletado</label>
+          <input type="text" id="tipo_dado" placeholder="Ex: contínuo, categórico, contagem">
+        </div>
+      </div>
+
+      <!-- 📊 Análise Estatística -->
+      <div class="section">
+        <div class="section-title">📊 Análise Estatística</div>
+        <div class="field">
+          <label>Pacote ou software utilizado</label>
+          <input type="text" id="software" placeholder="Ex: R, SPSS, Python, GraphPad Prism">
+        </div>
+        <div class="field">
+          <label>Testes ou modelos aplicados</label>
+          <input type="text" id="testes" placeholder="Ex: ANOVA, teste t, modelo misto">
+        </div>
+        <div class="field">
+          <label>Fatores fixos e aleatórios</label>
+          <input type="text" id="fatores" placeholder="Ex: tratamento (fixo), indivíduo (aleatório)">
+        </div>
+        <div class="field">
+          <label>Verificação de pressupostos</label>
+          <input type="text" id="pressupostos" placeholder="Ex: normalidade (Shapiro-Wilk), homocedasticidade (Levene)">
+        </div>
+        <div class="field">
+          <label>Nível de significância adotado</label>
+          <input type="text" id="significancia" placeholder="Ex: 5% (p < 0,05)">
+        </div>
+        <div class="field">
+          <label>Apresentação dos resultados</label>
+          <input type="text" id="apresentacao" placeholder="Ex: média ± erro padrão, gráficos de boxplot">
+        </div>
+      </div>
+
+      <!-- 🧠 Auxílio na Escolha do Modelo -->
+      <div class="section">
+        <div class="section-title">🧠 Auxílio na Escolha do Modelo</div>
+        <div class="field">
+          <label>Tipo de variável resposta</label>
+          <input type="text" id="var_resposta" placeholder="Ex: contínua, categórica, tempo até evento">
+        </div>
+        <div class="field">
+          <label>Há medidas repetidas ou efeito de tempo?</label>
+          <input type="text" id="medidas_repetidas" placeholder="Ex: sim, medidas antes e após">
+        </div>
+        <div class="field">
+          <label>Há agrupamento?</label>
+          <input type="text" id="agrupamento" placeholder="Ex: pacientes dentro de clínicas">
+        </div>
+      </div>
+
+      <!-- Saída -->
+      <div class="prompt-output" id="promptOutput">
+        <div class="section-title">✨ Prompt Gerado</div>
+        <div class="prompt-text" id="promptText"></div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-generate" onclick="generatePrompt()">
+        🚀 <span>Gerar Prompt</span>
+      </button>
+      <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">
+        📋 <span id="copyText">Copiar Prompt</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function generatePrompt(){
+      const fields={
+        tipo_estudo: document.getElementById('tipo_estudo').value,
+        objetivo: document.getElementById('objetivo').value,
+        var_independentes: document.getElementById('var_independentes').value,
+        var_dependentes: document.getElementById('var_dependentes').value,
+        grupos: document.getElementById('grupos').value,
+        repeticoes: document.getElementById('repeticoes').value,
+        unidade: document.getElementById('unidade').value,
+        aleatorizacao: document.getElementById('aleatorizacao').value,
+        tamanho_amostra: document.getElementById('tamanho_amostra').value,
+        criterios_inclusao: document.getElementById('criterios_inclusao').value,
+        criterios_exclusao: document.getElementById('criterios_exclusao').value,
+        periodo_local: document.getElementById('periodo_local').value,
+        instrumentos: document.getElementById('instrumentos').value,
+        frequencia: document.getElementById('frequencia').value,
+        tipo_dado: document.getElementById('tipo_dado').value,
+        software: document.getElementById('software').value,
+        testes: document.getElementById('testes').value,
+        fatores: document.getElementById('fatores').value,
+        pressupostos: document.getElementById('pressupostos').value,
+        significancia: document.getElementById('significancia').value,
+        apresentacao: document.getElementById('apresentacao').value,
+        var_resposta: document.getElementById('var_resposta').value,
+        medidas_repetidas: document.getElementById('medidas_repetidas').value,
+        agrupamento: document.getElementById('agrupamento').value
+      };
+
+      const prompt=`Você é um redator científico especializado em metodologia. Quero que você escreva a seção Materiais e Métodos, incluindo a parte estatística, de forma clara, objetiva e no estilo acadêmico.
+
+Use as informações que vou te passar a seguir para descrever todo o experimento, e no final detalhe a análise estatística, explicando o tipo de modelo e justificando a escolha.
+
+🧪 1. DESENHO EXPERIMENTAL
+
+* Tipo de estudo: ${fields.tipo_estudo || '[não informado]'}
+* Objetivo principal: ${fields.objetivo || '[não informado]'}
+* Variáveis independentes (fatores): ${fields.var_independentes || '[não informado]'}
+* Variáveis dependentes (respostas): ${fields.var_dependentes || '[não informado]'}
+* Número de grupos e tratamentos: ${fields.grupos || '[não informado]'}
+* Número de repetições por grupo: ${fields.repeticoes || '[não informado]'}
+* Unidade experimental: ${fields.unidade || '[não informado]'}
+* Tipo de aleatorização: ${fields.aleatorizacao || '[não informado]'}
+
+🧍‍♀️ 2. AMOSTRA E CRITÉRIOS
+
+* Tamanho da amostra: ${fields.tamanho_amostra || '[não informado]'}
+* Critérios de inclusão: ${fields.criterios_inclusao || '[não informado]'}
+* Critérios de exclusão: ${fields.criterios_exclusao || '[não informado]'}
+* Período e local do estudo: ${fields.periodo_local || '[não informado]'}
+
+⚙️ 3. COLETA E PROCESSAMENTO DOS DADOS
+
+* Instrumentos ou equipamentos usados: ${fields.instrumentos || '[não informado]'}
+* Frequência das medições: ${fields.frequencia || '[não informado]'}
+* Tipo de dado coletado: ${fields.tipo_dado || '[não informado]'}
+
+📊 4. ANÁLISE ESTATÍSTICA
+
+* Pacote ou software utilizado: ${fields.software || '[não informado]'}
+* Testes ou modelos aplicados: ${fields.testes || '[não informado]'}
+* Fatores fixos e aleatórios (se houver): ${fields.fatores || '[não informado]'}
+* Verificação de pressupostos: ${fields.pressupostos || '[não informado]'}
+* Nível de significância adotado: ${fields.significancia || '[não informado]'}
+* Apresentação dos resultados: ${fields.apresentacao || '[não informado]'}
+
+🧠 5. AUXÍLIO NA ESCOLHA DO MODELO ESTATÍSTICO
+
+* Tipo de variável resposta: ${fields.var_resposta || '[não informado]'}
+* Há medidas repetidas ou efeito de tempo? ${fields.medidas_repetidas || '[não informado]'}
+* Há agrupamento? ${fields.agrupamento || '[não informado]'}
+
+A partir dessas respostas, sugira:
+* O modelo estatístico mais adequado (ANOVA, modelo misto, GLM, GLMM, Cox, etc.)
+* A distribuição usada (Normal, Binomial, Poisson, Binomial Negativa, etc.)
+* E uma justificativa teórica da escolha.
+
+Por favor, redija a seção completa de Materiais e Métodos de forma acadêmica e profissional.`;
+
+      document.getElementById('promptText').textContent = prompt;
+      document.getElementById('promptOutput').classList.add('show');
+      document.getElementById('copyBtn').classList.add('show');
+
+      document.getElementById('promptOutput')
+        .scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+
+    function copyPrompt(){
+      const promptText=document.getElementById('promptText').textContent;
+      const copyBtn=document.getElementById('copyBtn');
+      const copyText=document.getElementById('copyText');
+
+      navigator.clipboard.writeText(promptText).then(()=>{
+        copyBtn.classList.add('copied');
+        copyText.textContent='✓ Copiado!';
+        setTimeout(()=>{
+          copyBtn.classList.remove('copied');
+          copyText.textContent='Copiar Prompt';
+        },1800);
+      });
+    }
+  </script>
+</body>
+</html>
